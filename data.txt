@@ -1,0 +1,20 @@
+port forward 
+
+internet ---(wlp0s20f3--192.168.2.154--computer---192.168.7.1--enx0479b7890acc)---(192.168.7.2:22 device).
+
+
+iptables -A PREROUTING -t nat -i wlp0s20f3 -p tcp --dport 22 -j DNAT --to 192.168.7.2:22
+iptables -A FORWARD -p tcp -d 192.168.7.2 --dport 22 -j ACCEPT
+
+
+internet connection sharing 
+
+ifconfig wlp0s20f3 192.168.7.1 255.255.255.0
+sudo iptables --append FORWARD --in-interface enx0479b7890acc -j ACCEPT
+iptables --table nat --append POSTROUTING --out-interface wlp0s20f3 -j MASQUERADE
+
+
+nano /proc/sys/net/ipv4/ip_forward to 1
+
+on device 
+sudo route add default gw 192.168.7.1
